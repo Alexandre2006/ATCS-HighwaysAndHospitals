@@ -1,9 +1,5 @@
-Name: YOUR NAME HERE
+Name: Alexandre Haddad-Delaveau
 
-| Date    |  Time  |                                     Update |
-|:--------|:------:|-------------------------------------------:|
-| April 5 | 9-10pm | I tried to write abstract, efficient code. |
-|         |        |                                            |
-
-
-To add a new row to the table, click into a cell and then hit shift-enter.
+| Date  |     Time      |                                                                                                                                                                                                                                                                                                         Update |
+|:------|:-------------:|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| Sep 9 | 10:00 - 10:30 | Cloned repository in class, and began thinking of a good algorithm for determining the total cost. Check HighwaysAndHospitals.java for info. Also began coding basic BFS and redesigned the class so I could store instance variables rather than having to pass the variables I need to each function I call. |
