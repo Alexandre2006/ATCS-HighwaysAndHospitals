@@ -16,11 +16,13 @@ public class HighwaysAndHospitals {
     int n;
     int hospitalCost;
     int highwayCost;
-    int[][] cities;
+    int[][] cities; // Edges (index is city, array is connected cities)
 
     // Keep track of visited cities
     boolean[] visited;
-    boolean[] hasHospital;
+
+    // Keep track of hospitals
+    int hospitalCount = 0;
 
     // Constructor
     public HighwaysAndHospitals(int n, int hospitalCost, int highwayCost, int[][] cities) {
@@ -28,7 +30,6 @@ public class HighwaysAndHospitals {
         this.hospitalCost = hospitalCost;
         this.highwayCost = highwayCost;
         visited = new boolean[n + 1];
-        hasHospital = new boolean[n + 1];
 
         // Convert cities to new format
         this.cities = new int[n + 1][];
@@ -46,12 +47,8 @@ public class HighwaysAndHospitals {
         }
     }
 
+    // TODO: Make Efficient
     public long cost() {
-        // BFS + CHECK IF NEW NEIGHBOURS * HIGHWAY COST < HOSPITAL COST
-        // If so, add highway
-        // Else, add hospital and destroy neighboring hospitals
-        // When complete, return total cost
-
         // Quick bypass for hospitals cost >= highways cost
         if (hospitalCost <= highwayCost) {
             return (long) n * hospitalCost;
@@ -69,7 +66,9 @@ public class HighwaysAndHospitals {
             // Add initial city to queue
             queue.add(initialCity);
             visited[initialCity] = true;
-            hasHospital[initialCity] = true;
+
+            // Count hospital in island
+            hospitalCount++;
 
             // Loop through neighbours
             while (!queue.isEmpty()) {
@@ -77,29 +76,16 @@ public class HighwaysAndHospitals {
                 int currentCity = queue.remove();
 
                 // Count new neighbours
-                int newNeighbours = 0;
                 for (int neighbour : cities[currentCity]) {
                     if (!visited[neighbour]) {
-                        newNeighbours++;
-
-                        // Also add to queue & mark visited
+                        // Mark as visited and add to queue
                         queue.add(neighbour);
                         visited[neighbour] = true;
                     }
                 }
-
-                // Decide if a hospital or neighbor is cheaper
-                if (buildHospital(newNeighbours)) {
-                    hasHospital[currentCity] = true;
-
-                    // If a hospital is built, destroy neighboring hospitals (if hopsital cost > highway cost)
-                    for (int neighbour : cities[currentCity]) {
-                        hasHospital[neighbour] = false;
-                    }
-                }
             }
         }
-        return calculateCost();
+        return ((long) hospitalCount * hospitalCost) + ((long) (n - hospitalCount) * highwayCost);
     }
 
     private int findFirstUnvisitedCity() {
@@ -109,24 +95,5 @@ public class HighwaysAndHospitals {
             }
         }
         return -1;
-    }
-
-    private boolean buildHospital(int neighbours) {
-        return neighbours * highwayCost > hospitalCost || highwayCost >= hospitalCost;
-    }
-
-    private long calculateCost() {
-        // Calculate cost of building hospitals and highways
-        // (assuming each city must either be connected by a highway or have a hospital)
-        long totalCost = 0;
-        for (int i = 1; i <= n; i++) {
-            if (hasHospital[i]) {
-                totalCost += hospitalCost;
-            } else {
-                totalCost += highwayCost;
-            }
-        }
-
-        return totalCost;
     }
 }
