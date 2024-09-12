@@ -20,6 +20,7 @@ public class HighwaysAndHospitals {
 
     // Keep track of visited cities
     boolean[] visited;
+    int lastUnvisited = 1;
 
     // Keep track of hospitals
     int hospitalCount = 0;
@@ -54,9 +55,7 @@ public class HighwaysAndHospitals {
             return (long) n * hospitalCost;
         }
 
-        // Queue for BFS
-        Queue<Integer> queue = new LinkedList<>();
-
+        // Count # of "islands" of nodes
         // Loop until all cities have been visited
         while (true) {
             // Check if there are any cities left to visit
@@ -64,33 +63,30 @@ public class HighwaysAndHospitals {
             if (initialCity == -1) break;
 
             // Add initial city to queue
-            queue.add(initialCity);
             visited[initialCity] = true;
 
             // Count hospital in island
             hospitalCount++;
 
-            // Loop through neighbours
-            while (!queue.isEmpty()) {
-                // Get current city
-                int currentCity = queue.remove();
-
-                // Count new neighbours
-                for (int neighbour : cities[currentCity]) {
-                    if (!visited[neighbour]) {
-                        // Mark as visited and add to queue
-                        queue.add(neighbour);
-                        visited[neighbour] = true;
-                    }
-                }
-            }
+            // Start DFS
+            dfs(initialCity);
         }
         return ((long) hospitalCount * hospitalCost) + ((long) (n - hospitalCount) * highwayCost);
     }
 
+    void dfs(int city) {
+        visited[city] = true;
+        for (int neighbour : cities[city]) {
+            if (!visited[neighbour]) {
+                dfs(neighbour);
+            }
+        }
+    }
+
     private int findFirstUnvisitedCity() {
-        for (int i = 1; i <= n; i++) {
+        for (int i = lastUnvisited; i <= n; i++) {
             if (!visited[i]) {
+                lastUnvisited = i;
                 return i;
             }
         }
