@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class HighwaysAndHospitalsTest {
 
+    private final HighwaysAndHospitals studentSolution = new HighwaysAndHospitals();
     private int n;
     private int m;
     private int hospitalCost;
@@ -74,7 +75,7 @@ public class HighwaysAndHospitalsTest {
             {
                 long answerCost = Long.parseLong(answerReader.readLine());
                 loadTest(testReader);
-                assertEquals(answerCost, new HighwaysAndHospitals(n, hospitalCost, hightwayCost, cities).cost(),
+                assertEquals(answerCost, studentSolution.cost(n, hospitalCost, hightwayCost, cities),
                         "Test " + testNumber + " failed: should return " + answerCost);
             }
         } catch (IOException e) {
