@@ -9,71 +9,64 @@ import java.util.ArrayList;
  * Completed by: Alexandre Haddad-Delaveau
  */
 
+// QUICK NOTE: Since I missed the class on Union-Find, I also used Wikipedia as a source for information on the algorithm.
+// Here is the link: https://en.wikipedia.org/wiki/Disjoint-set_data_structure
+// Please let me know if this is something I should refrain from doing in the future.
+
 public class HighwaysAndHospitals {
-    public long cost(int n, int hospitalCost, int highwayCost, int[][] oldCities) {
-        // Quick bypass for hospitals cost >= highways cost
+    public long cost(int n, int hospitalCost, int highwayCost, int[][] connections) {
+        // Quick exit for hospital cost being lower than highway cost
         if (hospitalCost <= highwayCost) {
             return (long) n * hospitalCost;
         }
 
-        // Variables for tracking visited cities & total hospital count
-        boolean[] visited = new boolean[n + 1];
-        int lastUnvisited = 1;
-        int hospitalCount = 0;
+        // Map of cities to their root nodes
+        int[] rootNodes = new int[n];
+        int[] rank = new int[n];
 
-        // Convert cities to map (city, neighbors)
-        int[][] cities = new int[n + 1][];
-        ArrayList<Integer>[] citiesArrayList = new ArrayList[n + 1];
-        for (int i = 1; i <= n; i++) citiesArrayList[i] = new ArrayList<>();
-
-        for (int[] edge : oldCities) {
-            citiesArrayList[edge[0]].add(edge[1]);
-            citiesArrayList[edge[1]].add(edge[0]);
+        // Add default values to root nodes
+        for (int i = 0; i < n; i++) {
+            rootNodes[i] = i;
+            rank[i] = 0;
         }
 
-        // Convert back to array
-        for (int i = 1; i <= n; i++) {
-            cities[i] = citiesArrayList[i].stream().mapToInt(j -> j).toArray();
-        }
+        // Loop through all city connections
+        for (int[] connection : connections) {
+            int root1 = find(connection[0] - 1, rootNodes);
+            int root2 = find(connection[1] - 1, rootNodes);
 
-        // Count # of "islands" of nodes
-        // Loop until all cities have been visited
-        while (true) {
-            // Check if there are any cities left to visit
-            int initialCity = findFirstUnvisitedCity(n, visited, lastUnvisited);
-            if (initialCity == -1) break;
-            lastUnvisited = initialCity;
-
-            // Add initial city to queue
-            visited[initialCity] = true;
-
-            // Count hospital in island
-            hospitalCount++;
-
-            // Start DFS (from initial city)
-            dfs(initialCity, visited, cities);
-        }
-        return ((long) hospitalCount * hospitalCost) + ((long) (n - hospitalCount) * highwayCost);
-    }
-
-    void dfs(int city, boolean[] visited, int[][] cities) {
-        // Performs DFS on the graph
-        // Doesn't actually search, just marks a city as visited
-        visited[city] = true;
-        for (int neighbour : cities[city]) {
-            if (!visited[neighbour]) {
-                dfs(neighbour, visited, cities);
+            // If the roots are different, merge the trees
+            if (root1 != root2) {
+                // Merge the trees
+                if (rank[root1] < rank[root2]) {
+                    rootNodes[root1] = root2;
+                } else if (rank[root1] > rank[root2]) {
+                    rootNodes[root2] = root1;
+                } else {
+                    rootNodes[root1] = root2;
+                    rank[root2]++;
+                }
             }
         }
-    }
 
-    private int findFirstUnvisitedCity(int n, boolean[] visited, int lastUnvisited) {
-        // Find the first unvisited city in the list of cities
-        for (int i = lastUnvisited; i <= n; i++) {
-            if (!visited[i]) {
-                return i;
+        // Count the number of root nodes
+        int rootNodesCount = 0;
+        for (int i = 0; i < n; i++) {
+            if (rootNodes[i] == i) {
+                rootNodesCount++;
             }
         }
-        return -1;
+
+        // Calculate the cost
+        return (long) rootNodesCount * hospitalCost + (long) (n - rootNodesCount) * highwayCost;
+    }
+
+    private int find(int node, int[] rootNodes) {
+        // Verify that the node is not the root node
+        if (rootNodes[node] != node) {
+            // Recursively find the root node
+            rootNodes[node] = find(rootNodes[node], rootNodes); // Path compression
+        }
+        return rootNodes[node];
     }
 }
