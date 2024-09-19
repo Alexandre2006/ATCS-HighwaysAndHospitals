@@ -21,17 +21,18 @@ public class HighwaysAndHospitals {
         }
 
         // Map of cities to their root nodes
+        // TODO: Could use -/+ value instead of second rank map
         int[] rootNodes = new int[n];
         int[] rank = new int[n];
 
         // Add default values to root nodes
         for (int i = 0; i < n; i++) {
             rootNodes[i] = i;
-            rank[i] = 0;
         }
 
         // Loop through all city connections
         for (int[] connection : connections) {
+            // Find roots (+ path compression)
             int root1 = find(connection[0] - 1, rootNodes);
             int root2 = find(connection[1] - 1, rootNodes);
 
@@ -62,10 +63,11 @@ public class HighwaysAndHospitals {
     }
 
     private int find(int node, int[] rootNodes) {
+        // TODO: Try and compare a recursive find function vs an iterative find function
         // Verify that the node is not the root node
         if (rootNodes[node] != node) {
-            // Recursively find the root node
-            rootNodes[node] = find(rootNodes[node], rootNodes); // Path compression
+            // Recursively find / update root nodes
+            rootNodes[node] = find(rootNodes[node], rootNodes); // i.e. Path compression
         }
         return rootNodes[node];
     }
